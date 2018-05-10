@@ -1,0 +1,13 @@
+*.o
+*.mod
+*~
+*.a
+*.bak
+*.aux
+*.dvi
+*.pdf
+*.toc
+*.log
+*.lst
+*.nc
+*.pe??????

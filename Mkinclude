@@ -1,0 +1,41 @@
+ifeq ($(origin BINDIR), undefined)
+   BINDIR = $(TOPDIR)/bin/$(SCALE_SYS)
+endif
+
+ifeq ($(origin LIBDIR), undefined)
+   LIBDIR = $(TOPDIR)/lib
+endif
+
+ifeq ($(origin MODDIR), undefined)
+   MODDIR = $(TOPDIR)/include
+endif
+
+ifeq ($(origin SYSDEP_DIR), undefined)
+   SYSDEP_DIR = $(TOPDIR)/sysdep
+endif
+
+GTOOLDIR    = $(TOPDIR)/gtool
+DCUTILSDIR  = $(TOPDIR)/dc_utils
+SCALELIBDIR = $(TOPDIR)/scalelib
+
+SCALELESDIR = $(TOPDIR)/scale-les
+SCALEGMDIR  = $(TOPDIR)/scale-gm
+
+ifeq ($(RDMA),-D_USE_RDMA)
+   mod_rdma := rdma.o
+else
+   mod_rdma :=
+endif
+
+ifeq ($(SDM),-D_SDM)
+   GAGETRYDIR      = $(TOPDIR)/contrib/Gadgetry
+   MTDIR           = $(TOPDIR)/contrib/mt
+   SDMDIR          = $(TOPDIR)/contrib/SDM
+   CONTRIB_LIBS    = $(LIBDIR)/libgagetry.a $(LIBDIR)/libmt.a $(LIBDIR)/libsdm.a
+   CONTRIB_INCLUDE = -I$(GAGETRYDIR) -I$(MTDIR) -I$(SDMDIR)
+else
+   GAGETRYDIR      =
+   MTDIR           =
+   CONTRIB_LIBS    =
+   CONTRIB_INCLUDE =
+endif

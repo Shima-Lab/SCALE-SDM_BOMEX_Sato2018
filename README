@@ -1,0 +1,101 @@
+--------------------------------------------------------------------------------
+Readme file for the code of SDM to reproduce the results of Sato et al. (2018).
+
+Corresponding Author: Yousuke Sato (y-sato[at]energy.nagoya-u.ac.jp)
+Originally created : May. 8, 2018
+--------------------------------------------------------------------------------
+
+1. General description
+This is readme file of the Super Droplet Method (SDM) code used for the numerical experiments of Sato et al. (2018). 
+For the experiments, SCALE-SDM code was used. The SDM was microphysical model, which was originally developed by S. Shima (Shima et al. 2009). SCALE is dynamical core developed in RIKEN/AICS (Nishizawa et al. 2015; Sato et al. 2015), and its source code can be downloadable from SCALE web page (http://scale.aics.riken.jp/) based on BSD-2 license.
+In this document, we describe how to conduct the simulation using SCALE-SDM. The detailed description about SCALE, SDM are written in the reference papers and documents of SCALE.  (Note: Descriptions in brackets [] means command)
+About the simulations of SCALE without SDM are described in the SCALE web page.
+
+2. The required software and supported environment
+Fortran and C compiler are required to compile SCALE-SDM. In addition, MPI library and NetCDF4, NetCDF-fortran4 library complied the compiler with HDF5 are also required. It was confirmed that the cord works normally by using Intel fortran/C compiler (ifort/icc) and Fujitsu compiler.
+
+3. How to compile SCALE-SDM
+3-1. Setup environment
+In the top directly, you can find a directly named sysdep. In the directly, there are files for the setup of the compile.
+An environment variable, SCALE_SYS should be set as a part of a file name existing in sysdep.
+For example, if you use the Intel fortran compiler on Linux, SCALE_SYS should be set as Linux64-intel-impi. Once you setup SCALE_SYS, your setting for compile should be described in sysdep/Makedef.$(SCALE_SYS).
+
+3-2. Change compiler options
+Open the sysdep/Makedef.$(SCALE_SYS) by text editor (e.g., vi, emacs), and modify the compile option for your environment.
+You should set at least the parts shown below.
+
+SDM: It should be "-D_SDM" (Do not change)
+FC: Fortran compiler with MPI
+CC: C compiler with MPI
+FFLAGS_FAST: Compile option of fortran compiler
+CFLAGS: Compile option of C compiler
+NETCDF_INCLUDE: Absolute path of the directly where module(include file) of NetCDF4 is installed (e.g. -I(path)/include).
+NETCDF_LIB: Absolute path of the directly where library (*.a) of NetCDF4 is installed (e.g. -L(path)/lib).
+
+
+If your NetCDF4, NetCDF-Fortran, HDF5, ZLIB are installed separate directly, you should write each absolute path of the directly as following:
+
+NETCDF_LIBS ?= -L(path of NetCDF4)/lib -lnetcdf -L$(path of NetCDF-Fortran) -lnetcdff -L$(path of HDF5)/lib -lhdf5_hl -lhdf5 -L$(path of ZLIB)/lib -lz -lm
+
+
+3-3. Compile SCALE-SDM
+To compile SCALE-SDM, change directly into "scale-les/test/case/shallowcloud/bomex_sdm" and conduct “make” command.
+[cd scale-les/test/case/shallowcloud/bomex_sdm]
+[make -j4]
+
+If scale-les, scale-les_init, and scale-les_pp are created, the compile is successfully finished.
+
+4. Conduct the experiment
+4-1. Prepare setup file (init.conf and run.conf)
+To conduct the experiment, you should prepare init.conf, and run.conf. An example of them are included in scale-les/test/case/shallowcloud/bomex_sdm/resolution_test/(xxx)m.
+In this document, we explain how to conduct the simulation with the grid length of dx/dz=100/80m. So, please copy these files (scale-les/test/case/shallowcloud/bomex_sdm/resolution_test/100m/init_dx100m.conf and scale-les/test/case/shallowcloud/bomex_sdm/resolution_test/100m/run_dx100m.conf) into the directly where you compiled SCALE-SDM.
+
+[cd scale-les/test/case/shallowcloud/bomex_sdm]
+[cp resolution_test/100m/*.conf .]
+
+Open the setup files by text editor, and edit them. You should change at least the parts shown bewlow.
+
+PRC_NUM_X: Number of node (MPI process) used for x direction
+PRC_NUM_Y: Number of node (MPI process) used for y direction
+
+KMAX: Number of vertical layers
+IMAX: Number of grids for x-direction in each MPI process
+JMAX: Number of grids for y-direction in each MPI process
+
+Note that the number of the grids for (x,y,z) direction is set as (PRC_NUM_X x IMAX, PRC_NUM_Y x JMAX, KMAX), and the number of MPI processes used for the numerical experiment is (PRC_NUM_X)x(PRC_NUM_Y). These parts should be same in init_dx100m.conf and run_dx100m.conf. 
+
+Detail of the setting is created in the document of SCALE, which is downloadable from SCALE web page (http://scale.aics.riken.jp/). If you want to know in detail about the setting, please contact corresponding author.
+
+4-2. Prepare the shell to run experiments.
+To run the experiment, a shell file to run the numerical simulation is required.
+You can get the example of the shell (run.sh) by a command as
+
+[make jobshell]
+
+in the directly, where you compiled SCALE-SDM. Example of the shell is as following:
+
+-----------------------(Example of run shell)------------------
+#! /bin/bash -x
+export FORT_FMT_RECL=400
+
+# run
+mpirun -np 6 ./scale-les_init init.conf || exit
+mpirun -np 6 ./scale-les  run.conf  || exit
+---------------------------------------------------------------
+
+To conduct experiment, you should change "6" after "-np" into the MPI process you set in setup files (***.conf). You should change name of init.conf and run.conf as setup files (init_dx100m.conf and run_dx100m.conf) that you edit in section 4.1. 
+
+4-3. Run the model
+SCALE-SDM runs by using the shell prepared in section 4-2. For example,
+
+[sh run.sh]
+
+If the simulation is finished successfully, history.pe***.nc (*** is number of the process) are created. These files are written by NetCDF format, and you can read information of axis, output variables by reading the header of history.pe***.nc.
+About the NetCDF, please read the document of NetCDF.
+
+(Reference)
+Nishizawa, S. (2015), Geosci. Model Dev., 8, 3393–3419, doi:10.5194/gmd-8-3393-2015. http://www.geosci-model-dev.net/8/3393/2015/.
+Sato, Y., (2015), Prog. Earth Planet. Sci., 2, 23, doi:10.1186/s40645-015-0053-6
+Sato, Y., S. Shima, and H. Tomita (2018), J. Adv. Model Earth Sys. in revision
+Shima, S. et al. (2009), Q. J. R. Meteorol. Soc., 135, 1307–1320, doi:10.1002/qj.441. http://doi.wiley.com/10.1002/qj.441
+
