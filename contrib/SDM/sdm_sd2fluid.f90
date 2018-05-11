@@ -313,10 +313,6 @@ contains
 
        do i_threads=1,num_threads
        do m=i_threads,tlist_c,num_threads
-if( size(ilist_c) < m .or. m < 1 ) then
-write(*,*) "HIHI", m, num_threads, tlist_c, i_threads, size(ilist_c), mype
-call PRC_MPIstop
-endif
           n = ilist_c(m)
 
           i = floor(sd_ri(n))+1
