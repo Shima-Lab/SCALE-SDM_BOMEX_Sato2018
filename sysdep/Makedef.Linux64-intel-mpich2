@@ -20,9 +20,9 @@ FFLAGS_DEBUG = -fpp3 -O0 -m64                       \
 
 # Super Droplet Method (SDM)
 # without SDM
-SDM =
+#SDM =
 # with SDM
-#SDM = -D_SDM
+SDM = -D_SDM
 
 FC     = mpif90
 FFLAGS = $(FFLAGS_FAST) $(SDM)
