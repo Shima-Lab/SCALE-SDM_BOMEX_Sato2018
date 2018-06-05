@@ -17,6 +17,7 @@
 !! @li      2014-07-14 (S.Shima) [rev] sdm_rhot_qtrc2cpexnr added
 !! @li      2014-07-24 (Y.Sato)  [mod] Modify bugs accessing upper/lower boundary
 !! @li      2014-07-25 (Y.Sato)  [mod] Modify a bug in sdm_rho_mom2uvw
+!! @li      2018-06-05 (S.Shima) [fix] Exner function in sdm_rhot_qtrc2cpexnr
 !!
 !<
 !-------------------------------------------------------------------------------
@@ -203,7 +204,7 @@ contains
        rtot (k,i,j) = Rdry * qdry(k,i,j) + Rvap * qtrc(k,i,j,I_QV)
        cptot(k,i,j) = CPdry * qdry(k,i,j)
        cptot(k,i,j) = cptot(k,i,j) + qtrc(k,i,j,I_QV) * CPw(I_QV)
-       cpexnr(k,i,j) = cptot(k,i,j)*(rhot(k,i,j)*rtot(k,i,j)/P00)**(-rtot(k,i,j)/(cptot(k,i,j)-rtot(k,i,j)))
+       cpexnr(k,i,j) = cptot(k,i,j)*(rhot(k,i,j)*rtot(k,i,j)/P00)**(rtot(k,i,j)/(cptot(k,i,j)-rtot(k,i,j)))
     enddo
     enddo
     enddo
